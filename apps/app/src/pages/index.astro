@@ -1,17 +1,25 @@
 ---
-
+import BaseLayout from '@workspace/ui/layouts/BaseLayout.astro';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout
+  title="App"
+  siteName="App"
+  topHref="#"
+>
+  <h1 class="page-title">App</h1>
+  <p class="lead">準備中です。</p>
+</BaseLayout>
+
+<style>
+  .page-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .lead {
+    font-size: 0.9375rem;
+    color: var(--color-muted);
+  }
+</style>

@@ -1,0 +1,43 @@
+---
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  siteName: string;
+  topHref?: string;
+  nav?: { label: string; href: string }[];
+}
+
+const { title, description = '', siteName, topHref = '#', nav = [] } = Astro.props;
+---
+
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    {description && <meta name="description" content={description} />}
+    <link rel="icon" href="/favicon.ico" />
+    <title>{title} | {siteName}</title>
+  </head>
+  <body>
+    <SiteHeader siteName={siteName} topHref={topHref} nav={nav} />
+    <main>
+      <slot />
+    </main>
+    <SiteFooter siteName={siteName} topHref={topHref} />
+  </body>
+</html>
+
+<style>
+  main {
+    flex: 1;
+    width: 100%;
+    max-width: calc(var(--max-content, 680px) + 4rem);
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem;
+  }
+</style>

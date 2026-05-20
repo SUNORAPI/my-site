@@ -1,0 +1,64 @@
+---
+interface Props {
+  siteName: string;
+  topHref?: string;
+  nav?: { label: string; href: string }[];
+}
+const { siteName, topHref = '#', nav = [] } = Astro.props;
+---
+
+<header>
+  <div class="inner">
+    <a class="site-name" href="/">{siteName}</a>
+    <nav>
+      {nav.map((item) => (
+        <a href={item.href}>{item.label}</a>
+      ))}
+      <a class="top-link" href={topHref}>← Top</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  header {
+    position: sticky;
+    top: 0;
+    background: var(--color-bg, #fafafa);
+    border-bottom: 1px solid var(--color-border, #e5e7eb);
+    z-index: 10;
+  }
+
+  .inner {
+    max-width: calc(var(--max-content, 680px) + 4rem);
+    margin: 0 auto;
+    padding: 0 1.25rem;
+    height: var(--header-height, 52px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .site-name {
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+    letter-spacing: 0.01em;
+  }
+
+  nav {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  nav a {
+    font-size: 0.875rem;
+    text-decoration: none;
+    color: var(--color-muted, #666);
+  }
+
+  nav a:hover { color: var(--color-text, #111); }
+
+  .top-link { color: var(--color-subtle, #999); }
+</style>

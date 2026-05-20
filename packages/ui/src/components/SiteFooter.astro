@@ -1,0 +1,35 @@
+---
+interface Props {
+  siteName: string;
+  topHref?: string;
+}
+const { siteName, topHref = '#' } = Astro.props;
+---
+
+<footer>
+  <div class="inner">
+    <span class="label">{siteName}</span>
+    <a href={topHref}>SUNORAPI</a>
+  </div>
+</footer>
+
+<style>
+  footer {
+    margin-top: auto;
+    border-top: 1px solid var(--color-border, #e5e7eb);
+    padding: 1.5rem 1.25rem;
+  }
+
+  .inner {
+    max-width: calc(var(--max-content, 680px) + 4rem);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.8125rem;
+    color: var(--color-subtle, #999);
+  }
+
+  a { text-decoration: none; }
+  a:hover { color: var(--color-text, #111); }
+</style>

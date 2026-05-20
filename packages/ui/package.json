@@ -1,0 +1,13 @@
+{
+  "name": "@workspace/ui",
+  "type": "module",
+  "version": "0.0.1",
+  "exports": {
+    "./layouts/*": "./src/layouts/*",
+    "./components/*": "./src/components/*",
+    "./styles/*": "./src/styles/*"
+  },
+  "peerDependencies": {
+    "astro": "^6.0.0"
+  }
+}
