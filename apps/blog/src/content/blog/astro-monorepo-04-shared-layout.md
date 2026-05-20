@@ -2,6 +2,8 @@
 title: 'Astroモノレポ構成編 #4 共通レイアウトの切り出し'
 description: 'packages/ui を作り、共通コンポーネントを workspace:* プロトコルで各アプリから参照する。'
 pubDate: 'May 01 2026'
+series: 'Astroモノレポ構成編'
+seriesOrder: 4
 ---
 
 > 本記事は最初からモノレポ構成でセットアップする連載の 4 話目である。1 リポジトリで 1 サイトだけ運用したい場合は「Astroで個人サイトを作る」連載を参照のこと。

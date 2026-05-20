@@ -7,81 +7,169 @@ import FormattedDate from '../../components/FormattedDate.astro';
 import Header from '../../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
 
-const posts = (await getCollection('blog')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-);
+const allPosts = await getCollection('blog');
+
+type Post = (typeof allPosts)[number];
+
+const seriesMap = new Map<string, Post[]>();
+const standalonePosts: Post[] = [];
+
+for (const post of allPosts) {
+	const series = post.data.series;
+	if (series) {
+		const arr = seriesMap.get(series) ?? [];
+		arr.push(post);
+		seriesMap.set(series, arr);
+	} else {
+		standalonePosts.push(post);
+	}
+}
+
+const seriesList = [...seriesMap.entries()].map(([name, posts]) => {
+	const sorted = [...posts].sort((a, b) => {
+		const oa = a.data.seriesOrder ?? 0;
+		const ob = b.data.seriesOrder ?? 0;
+		return oa - ob;
+	});
+	return {
+		name,
+		posts: sorted,
+		latestDate: sorted.reduce(
+			(max, p) => (p.data.pubDate > max ? p.data.pubDate : max),
+			sorted[0].data.pubDate,
+		),
+	};
+});
+
+seriesList.sort((a, b) => b.latestDate.valueOf() - a.latestDate.valueOf());
+standalonePosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="ja">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 		<style>
 			main {
 				width: 960px;
+				max-width: calc(100% - 2em);
 			}
-			ul {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 2rem;
-				list-style-type: none;
+			.section-heading {
+				font-size: 1.2em;
+				margin: 2.5em 0 1em;
+				padding-bottom: 0.4em;
+				border-bottom: 2px solid rgb(var(--gray-light));
+			}
+			.section-heading:first-of-type {
+				margin-top: 0;
+			}
+			.card-grid {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 1.5rem;
+				list-style: none;
 				margin: 0;
 				padding: 0;
 			}
-			ul li {
-				width: calc(50% - 1rem);
-			}
-			ul li * {
-				text-decoration: none;
-				transition: 0.2s ease;
-			}
-			ul li:first-child {
-				width: 100%;
-				margin-bottom: 1rem;
-				text-align: center;
-			}
-			ul li:first-child img {
-				width: 100%;
-			}
-			ul li:first-child .title {
-				font-size: 2.369rem;
-			}
-			ul li img {
-				margin-bottom: 0.5rem;
-				border-radius: 12px;
-			}
-			ul li a {
+			.card-grid li a {
 				display: block;
+				text-decoration: none;
+				color: inherit;
+				border-radius: 12px;
+				overflow: hidden;
+				background: #fff;
+				border: 1px solid rgb(var(--gray-light));
+				transition: transform 0.15s ease, box-shadow 0.15s ease;
+				height: 100%;
 			}
-			.title {
+			.card-grid li a:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 4px 16px rgba(var(--gray), 25%);
+			}
+			.thumb {
+				display: block;
+				width: 100%;
+				aspect-ratio: 16 / 9;
+				object-fit: cover;
+				background: linear-gradient(
+					135deg,
+					rgb(var(--gray-light)),
+					rgba(var(--gray), 0.25)
+				);
+			}
+			.thumb-placeholder {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: rgb(var(--gray));
+				font-size: 0.9em;
+			}
+			.card-body {
+				padding: 1em 1.2em 1.2em;
+			}
+			.card-title {
+				font-size: 1.05em;
+				font-weight: 700;
+				margin: 0 0 0.4em;
+				color: rgb(var(--black));
+				line-height: 1.4;
+			}
+			.card-meta {
+				font-size: 0.85em;
+				color: rgb(var(--gray));
+				margin: 0;
+			}
+			.card-description {
+				font-size: 0.9em;
+				color: rgb(var(--gray-dark));
+				margin: 0.5em 0 0;
+				line-height: 1.6;
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
+			}
+			.series-badge {
+				display: inline-block;
+				font-size: 0.75em;
+				background: rgba(var(--gray-light), 1);
+				color: rgb(var(--gray-dark));
+				padding: 0.15em 0.6em;
+				border-radius: 999px;
+				margin-right: 0.4em;
+			}
+			.series-block {
+				margin-bottom: 2.5em;
+				padding: 1.2em;
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 12px;
+				background: rgba(var(--gray-light), 0.3);
+			}
+			.series-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: baseline;
+				margin-bottom: 1em;
+				flex-wrap: wrap;
+				gap: 0.5em;
+			}
+			.series-name {
+				font-size: 1.1em;
+				font-weight: 700;
 				margin: 0;
 				color: rgb(var(--black));
-				line-height: 1;
 			}
-			.date {
-				margin: 0;
+			.series-count {
+				font-size: 0.85em;
 				color: rgb(var(--gray));
 			}
-			ul li a:hover h4,
-			ul li a:hover .date {
-				color: rgb(var(--accent));
-			}
-			ul a:hover img {
-				box-shadow: var(--box-shadow);
-			}
 			@media (max-width: 720px) {
-				ul {
-					gap: 0.5em;
+				.card-grid {
+					grid-template-columns: 1fr;
+					gap: 1rem;
 				}
-				ul li {
-					width: 100%;
-					text-align: center;
-				}
-				ul li:first-child {
-					margin-bottom: 0;
-				}
-				ul li:first-child .title {
-					font-size: 1.563em;
+				.series-block {
+					padding: 0.8em;
 				}
 			}
 		</style>
@@ -90,18 +178,83 @@ const posts = (await getCollection('blog')).sort(
 		<Header />
 		<main>
 			<section>
-				<ul>
+				{
+					seriesList.length > 0 && (
+						<h2 class="section-heading">シリーズ</h2>
+					)
+				}
+				{
+					seriesList.map((series) => (
+						<div class="series-block">
+							<div class="series-header">
+								<h3 class="series-name">{series.name}</h3>
+								<span class="series-count">全 {series.posts.length} 話</span>
+							</div>
+							<ul class="card-grid">
+								{series.posts.map((post) => (
+									<li>
+										<a href={`/blog/${post.id}/`}>
+											{post.data.heroImage ? (
+												<Image
+													class="thumb"
+													width={720}
+													height={405}
+													src={post.data.heroImage}
+													alt=""
+												/>
+											) : (
+												<div class="thumb thumb-placeholder">
+													<span>No image</span>
+												</div>
+											)}
+											<div class="card-body">
+												<p class="card-meta">
+													<span class="series-badge">
+														第 {post.data.seriesOrder ?? '?'} 話
+													</span>
+													<FormattedDate date={post.data.pubDate} />
+												</p>
+												<h4 class="card-title">{post.data.title}</h4>
+												<p class="card-description">{post.data.description}</p>
+											</div>
+										</a>
+									</li>
+								))}
+							</ul>
+						</div>
+					))
+				}
+
+				{
+					standalonePosts.length > 0 && (
+						<h2 class="section-heading">単発記事</h2>
+					)
+				}
+				<ul class="card-grid">
 					{
-						posts.map((post) => (
+						standalonePosts.map((post) => (
 							<li>
 								<a href={`/blog/${post.id}/`}>
-									{post.data.heroImage && (
-										<Image width={720} height={360} src={post.data.heroImage} alt="" />
+									{post.data.heroImage ? (
+										<Image
+											class="thumb"
+											width={720}
+											height={405}
+											src={post.data.heroImage}
+											alt=""
+										/>
+									) : (
+										<div class="thumb thumb-placeholder">
+											<span>No image</span>
+										</div>
 									)}
-									<h4 class="title">{post.data.title}</h4>
-									<p class="date">
-										<FormattedDate date={post.data.pubDate} />
-									</p>
+									<div class="card-body">
+										<p class="card-meta">
+											<FormattedDate date={post.data.pubDate} />
+										</p>
+										<h4 class="card-title">{post.data.title}</h4>
+										<p class="card-description">{post.data.description}</p>
+									</div>
 								</a>
 							</li>
 						))

@@ -2,6 +2,8 @@
 title: 'Astroモノレポ構成編 #5 マルチサイトのデプロイ'
 description: '4 アプリを GitHub に push し、Cloudflare Pages 上で個別プロジェクトとしてサブドメイン配信する。'
 pubDate: 'May 03 2026'
+series: 'Astroモノレポ構成編'
+seriesOrder: 5
 ---
 
 > 本記事は最初からモノレポ構成でセットアップする連載の最終話である。1 リポジトリで 1 サイトだけ運用したい場合は「Astroで個人サイトを作る」連載を参照のこと。

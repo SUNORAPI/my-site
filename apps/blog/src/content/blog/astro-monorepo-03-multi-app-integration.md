@@ -2,6 +2,8 @@
 title: 'Astroモノレポ構成編 #3 複数アプリの作成'
 description: 'apps/ 配下に blog / tech / app / wiki の 4 つの Astro アプリを生成し、pnpm install と pnpm approve-builds で依存を整える。'
 pubDate: 'Apr 29 2026'
+series: 'Astroモノレポ構成編'
+seriesOrder: 3
 ---
 
 > 本記事は最初からモノレポ構成でセットアップする連載の 3 話目である。1 リポジトリで 1 サイトだけ運用したい場合は「Astroで個人サイトを作る」連載を参照のこと。
