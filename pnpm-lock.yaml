@@ -38,6 +38,12 @@ importers:
         specifier: ^6.1.8
         version: 6.1.8(@types/node@24.12.2)(rollup@4.60.2)
 
+  apps/top:
+    dependencies:
+      astro:
+        specifier: ^6.1.8
+        version: 6.1.8(@types/node@24.12.2)(rollup@4.60.2)
+
 packages:
 
   '@astrojs/compiler@3.0.1':
