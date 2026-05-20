@@ -1,17 +1,35 @@
 ---
 import { Image } from 'astro:assets';
-import type { CollectionEntry } from 'astro:content';
+import { type CollectionEntry, getCollection } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 
-type Props = CollectionEntry<'blog'>['data'];
+type Props = CollectionEntry<'blog'>['data'] & { id?: string };
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, series, seriesOrder, id } = Astro.props;
+
+let seriesPosts: CollectionEntry<'blog'>[] = [];
+let prevInSeries: CollectionEntry<'blog'> | null = null;
+let nextInSeries: CollectionEntry<'blog'> | null = null;
+let currentIndex = -1;
+
+if (series) {
+	const all = await getCollection('blog');
+	seriesPosts = all
+		.filter((p) => p.data.series === series)
+		.sort((a, b) => (a.data.seriesOrder ?? 0) - (b.data.seriesOrder ?? 0));
+	currentIndex = seriesPosts.findIndex((p) => p.data.title === title);
+	if (currentIndex >= 0) {
+		prevInSeries = currentIndex > 0 ? seriesPosts[currentIndex - 1] : null;
+		nextInSeries =
+			currentIndex < seriesPosts.length - 1 ? seriesPosts[currentIndex + 1] : null;
+	}
+}
 ---
 
-<html lang="en">
+<html lang="ja">
 	<head>
 		<BaseHead title={title} description={description} />
 		<style>
@@ -40,17 +58,100 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				margin-bottom: 1em;
 				padding: 1em 0;
 				text-align: center;
-				line-height: 1;
 			}
 			.title h1 {
 				margin: 0 0 0.5em 0;
+				line-height: 1.4;
 			}
 			.date {
 				margin-bottom: 0.5em;
 				color: rgb(var(--gray));
+				font-size: 0.9em;
 			}
 			.last-updated-on {
 				font-style: italic;
+			}
+			.series-banner {
+				display: inline-block;
+				font-size: 0.85em;
+				background: rgba(var(--gray-light), 1);
+				color: rgb(var(--gray-dark));
+				padding: 0.3em 0.9em;
+				border-radius: 999px;
+				margin-bottom: 1em;
+				text-decoration: none;
+			}
+			.series-banner:hover {
+				background: rgba(var(--gray), 0.2);
+			}
+			.series-nav {
+				margin: 3em 0 1em;
+				padding: 1.2em;
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 12px;
+				background: rgba(var(--gray-light), 0.3);
+			}
+			.series-nav-title {
+				font-size: 0.95em;
+				font-weight: 700;
+				margin: 0 0 0.8em;
+				color: rgb(var(--black));
+			}
+			.series-nav ol {
+				list-style: none;
+				padding: 0;
+				margin: 0;
+			}
+			.series-nav li {
+				padding: 0.35em 0;
+				font-size: 0.95em;
+			}
+			.series-nav li a {
+				color: var(--accent);
+				text-decoration: none;
+			}
+			.series-nav li a:hover {
+				text-decoration: underline;
+			}
+			.series-nav li.current {
+				color: rgb(var(--black));
+				font-weight: 700;
+			}
+			.series-nav li.current::before {
+				content: '▶ ';
+			}
+			.prev-next {
+				display: flex;
+				justify-content: space-between;
+				gap: 1em;
+				margin: 2em 0 0;
+				flex-wrap: wrap;
+			}
+			.prev-next a {
+				flex: 1 1 45%;
+				padding: 1em;
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 8px;
+				text-decoration: none;
+				color: inherit;
+				transition: background 0.15s ease;
+			}
+			.prev-next a:hover {
+				background: rgba(var(--gray-light), 0.3);
+			}
+			.prev-next .label {
+				font-size: 0.8em;
+				color: rgb(var(--gray));
+				margin-bottom: 0.3em;
+			}
+			.prev-next .pn-title {
+				font-size: 0.95em;
+				color: rgb(var(--black));
+				font-weight: 700;
+				line-height: 1.4;
+			}
+			.prev-next .next {
+				text-align: right;
 			}
 		</style>
 	</head>
@@ -64,6 +165,14 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				</div>
 				<div class="prose">
 					<div class="title">
+						{
+							series && (
+								<a class="series-banner" href={`/series/${encodeURIComponent(series)}/`}>
+									シリーズ: {series}
+									{seriesOrder !== undefined && <> (第 {seriesOrder} 話)</>}
+								</a>
+							)
+						}
 						<div class="date">
 							<FormattedDate date={pubDate} />
 							{
@@ -78,6 +187,52 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 						<hr />
 					</div>
 					<slot />
+
+					{
+						series && seriesPosts.length > 0 && (
+							<nav class="series-nav">
+								<p class="series-nav-title">シリーズ: {series}</p>
+								<ol>
+									{seriesPosts.map((p, idx) => (
+										<li class={idx === currentIndex ? 'current' : ''}>
+											{idx === currentIndex ? (
+												<span>
+													第 {p.data.seriesOrder ?? idx + 1} 話　{p.data.title}
+												</span>
+											) : (
+												<a href={`/blog/${p.id}/`}>
+													第 {p.data.seriesOrder ?? idx + 1} 話　{p.data.title}
+												</a>
+											)}
+										</li>
+									))}
+								</ol>
+							</nav>
+						)
+					}
+
+					{
+						series && (prevInSeries || nextInSeries) && (
+							<div class="prev-next">
+								{prevInSeries ? (
+									<a href={`/blog/${prevInSeries.id}/`} class="prev">
+										<div class="label">← 前の話</div>
+										<div class="pn-title">{prevInSeries.data.title}</div>
+									</a>
+								) : (
+									<span />
+								)}
+								{nextInSeries ? (
+									<a href={`/blog/${nextInSeries.id}/`} class="next">
+										<div class="label">次の話 →</div>
+										<div class="pn-title">{nextInSeries.data.title}</div>
+									</a>
+								) : (
+									<span />
+								)}
+							</div>
+						)
+					}
 				</div>
 			</article>
 		</main>

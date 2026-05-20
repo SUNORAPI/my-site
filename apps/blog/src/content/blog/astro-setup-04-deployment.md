@@ -2,6 +2,8 @@
 title: 'Astroで個人サイトを作る #4 GitHubとCloudflare Pagesでデプロイ'
 description: 'SSH キー設定から GitHub への push、Cloudflare Pages へのデプロイまでを扱う。ホスティング比較と CI/CD の組み立て方も整理する。'
 pubDate: 'Apr 17 2026'
+series: 'Astroで個人サイトを作る'
+seriesOrder: 4
 ---
 
 > 本記事は単一プロジェクト構成の連載の 4 話目である。複数サイトを 1 リポジトリで運用したい場合は「Astroモノレポ構成編」を参照のこと。

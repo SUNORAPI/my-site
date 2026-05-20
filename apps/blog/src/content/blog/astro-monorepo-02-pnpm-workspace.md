@@ -2,6 +2,8 @@
 title: 'Astroモノレポ構成編 #2 ワークスペースの初期化'
 description: 'pnpm init から pnpm-workspace.yaml の作成までを行い、ルートの責務を整える。'
 pubDate: 'Apr 27 2026'
+series: 'Astroモノレポ構成編'
+seriesOrder: 2
 ---
 
 > 本記事は最初からモノレポ構成でセットアップする連載の 2 話目である。1 リポジトリで 1 サイトだけ運用したい場合は「Astroで個人サイトを作る」連載を参照のこと。

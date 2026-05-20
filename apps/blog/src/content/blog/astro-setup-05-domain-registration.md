@@ -2,6 +2,8 @@
 title: 'Astroで個人サイトを作る #5 ドメイン取得とDNS設定'
 description: '独自ドメインを取得し、Cloudflare Pages に紐付けて HTTPS を有効化する。DNS の基礎やリダイレクト戦略も合わせて整理する。'
 pubDate: 'Apr 18 2026'
+series: 'Astroで個人サイトを作る'
+seriesOrder: 5
 ---
 
 > 本記事は単一プロジェクト構成の連載の最終話である。複数サイトを 1 リポジトリで運用したい場合は「Astroモノレポ構成編」を参照のこと。
