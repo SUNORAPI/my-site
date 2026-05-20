@@ -1,10 +1,8 @@
 ---
 import { Image } from 'astro:assets';
 import { type CollectionEntry, getCollection } from 'astro:content';
-import BaseHead from '../../components/BaseHead.astro';
-import Footer from '../../components/Footer.astro';
+import BaseLayout from '@workspace/ui/layouts/BaseLayout.astro';
 import FormattedDate from '../../components/FormattedDate.astro';
-import Header from '../../components/Header.astro';
 
 export async function getStaticPaths() {
 	const all = await getCollection('blog');
@@ -35,141 +33,140 @@ type Props = {
 const { series, posts } = Astro.props;
 ---
 
-<!doctype html>
-<html lang="ja">
-	<head>
-		<BaseHead title={`シリーズ: ${series}`} description={`「${series}」シリーズの記事一覧`} />
-		<style>
-			main {
-				width: 960px;
-				max-width: calc(100% - 2em);
-			}
-			.series-title {
-				font-size: 1.5em;
-				margin: 0 0 0.3em;
-			}
-			.series-meta {
-				color: rgb(var(--gray));
-				font-size: 0.9em;
-				margin-bottom: 2em;
-			}
-			.card-grid {
-				display: grid;
-				grid-template-columns: repeat(2, 1fr);
-				gap: 1.5rem;
-				list-style: none;
-				margin: 0;
-				padding: 0;
-			}
-			.card-grid li a {
-				display: block;
-				text-decoration: none;
-				color: inherit;
-				border-radius: 12px;
-				overflow: hidden;
-				background: #fff;
-				border: 1px solid rgb(var(--gray-light));
-				transition: transform 0.15s ease, box-shadow 0.15s ease;
-				height: 100%;
-			}
-			.card-grid li a:hover {
-				transform: translateY(-2px);
-				box-shadow: 0 4px 16px rgba(var(--gray), 25%);
-			}
-			.thumb {
-				display: block;
-				width: 100%;
-				aspect-ratio: 16 / 9;
-				object-fit: cover;
-				background: linear-gradient(
-					135deg,
-					rgb(var(--gray-light)),
-					rgba(var(--gray), 0.25)
-				);
-			}
-			.thumb-placeholder {
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				color: rgb(var(--gray));
-				font-size: 0.9em;
-			}
-			.card-body {
-				padding: 1em 1.2em 1.2em;
-			}
-			.card-title {
-				font-size: 1.05em;
-				font-weight: 700;
-				margin: 0 0 0.4em;
-				color: rgb(var(--black));
-				line-height: 1.4;
-			}
-			.card-meta {
-				font-size: 0.85em;
-				color: rgb(var(--gray));
-				margin: 0;
-			}
-			.card-description {
-				font-size: 0.9em;
-				color: rgb(var(--gray-dark));
-				margin: 0.5em 0 0;
-				line-height: 1.6;
-			}
-			.series-badge {
-				display: inline-block;
-				font-size: 0.75em;
-				background: rgba(var(--gray-light), 1);
-				color: rgb(var(--gray-dark));
-				padding: 0.15em 0.6em;
-				border-radius: 999px;
-				margin-right: 0.4em;
-			}
-			@media (max-width: 720px) {
-				.card-grid {
-					grid-template-columns: 1fr;
-				}
-			}
-		</style>
-	</head>
-	<body>
-		<Header />
-		<main>
-			<h1 class="series-title">シリーズ: {series}</h1>
-			<p class="series-meta">全 {posts.length} 話</p>
-			<ul class="card-grid">
-				{
-					posts.map((post) => (
-						<li>
-							<a href={`/blog/${post.id}/`}>
-								{post.data.heroImage ? (
-									<Image
-										class="thumb"
-										width={720}
-										height={405}
-										src={post.data.heroImage}
-										alt=""
-									/>
-								) : (
-									<div class="thumb thumb-placeholder">
-										<span>No image</span>
-									</div>
-								)}
-								<div class="card-body">
-									<p class="card-meta">
-										<span class="series-badge">
-											第 {post.data.seriesOrder ?? '?'} 話
-										</span>
-										<FormattedDate date={post.data.pubDate} />
-									</p>
-									<h4 class="card-title">{post.data.title}</h4>
-									<p class="card-description">{post.data.description}</p>
+<BaseLayout
+	title={`シリーズ: ${series}`}
+	siteName="Blog"
+	description={`「${series}」シリーズの記事一覧`}
+	topHref="/"
+	nav={[{ label: 'Blog', href: '/blog' }, { label: 'About', href: '/about' }]}
+>
+	<div class="wide">
+		<h1 class="series-title">シリーズ: {series}</h1>
+		<p class="series-meta">全 {posts.length} 話</p>
+		<ul class="card-grid">
+			{
+				posts.map((post) => (
+					<li>
+						<a href={`/blog/${post.id}/`}>
+							{post.data.heroImage ? (
+								<Image
+									class="thumb"
+									width={720}
+									height={405}
+									src={post.data.heroImage}
+									alt=""
+								/>
+							) : (
+								<div class="thumb thumb-placeholder">
+									<span>No image</span>
 								</div>
-							</a>
-						</li>
-					))
-				}
-			</ul>
-		</main>
-		<Footer />
-	</body>
-</html>
+							)}
+							<div class="card-body">
+								<p class="card-meta">
+									<span class="series-badge">
+										第 {post.data.seriesOrder ?? '?'} 話
+									</span>
+									<FormattedDate date={post.data.pubDate} />
+								</p>
+								<h4 class="card-title">{post.data.title}</h4>
+								<p class="card-description">{post.data.description}</p>
+							</div>
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+</BaseLayout>
+
+<style is:global>
+	body:has(.wide) {
+		--max-content: 920px;
+	}
+</style>
+
+<style>
+	.series-title {
+		font-size: 1.5rem;
+		font-weight: 700;
+		margin: 0 0 0.3rem;
+		color: var(--color-text);
+	}
+	.series-meta {
+		color: var(--color-subtle);
+		font-size: 0.9rem;
+		margin-bottom: 2rem;
+	}
+	.card-grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 1.25rem;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	.card-grid > li > a {
+		display: block;
+		text-decoration: none;
+		color: inherit;
+		border-radius: 12px;
+		overflow: hidden;
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		transition: transform 0.15s ease, box-shadow 0.15s ease;
+		height: 100%;
+	}
+	.card-grid > li > a:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+	}
+	.thumb {
+		display: block;
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		object-fit: cover;
+		background: linear-gradient(135deg, #eef0f3, #d8dde4);
+	}
+	.thumb-placeholder {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--color-subtle);
+		font-size: 0.85rem;
+	}
+	.card-body {
+		padding: 0.9rem 1.1rem 1.1rem;
+	}
+	.card-title {
+		font-size: 0.98rem;
+		font-weight: 700;
+		margin: 0 0 0.4rem;
+		color: var(--color-text);
+		line-height: 1.5;
+	}
+	.card-meta {
+		font-size: 0.8rem;
+		color: var(--color-subtle);
+		margin: 0;
+	}
+	.card-description {
+		font-size: 0.85rem;
+		color: var(--color-muted);
+		margin: 0.5rem 0 0;
+		line-height: 1.6;
+	}
+	.series-badge {
+		display: inline-block;
+		font-size: 0.72rem;
+		background: var(--color-code-bg);
+		color: var(--color-muted);
+		padding: 0.1em 0.6em;
+		border-radius: 999px;
+		margin-right: 0.4em;
+	}
+	@media (max-width: 720px) {
+		.card-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>
