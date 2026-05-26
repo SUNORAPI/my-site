@@ -7,3 +7,6 @@ dist/
 # Claude Code
 CLAUDE.md
 .claude/
+
+# Archived content (default Astro sample posts)
+apps/blog/src/content/_archived/
